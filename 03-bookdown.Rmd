@@ -1,0 +1,25 @@
+# library(bookdown)
+
+
+* First do `knitr` on `index.Rmd`to create `packages.bib` file.
+
+* [BOOKDOWN](https://bookdown.org/) Write HTML, PDF, ePub, and Kindle books with R Markdown
+
+* [install](https://bookdown.org/yihui/bookdown/get-started.html)
+
+```r
+install.packages("bookdown")
+```
+
+Clone [bookdown-demo.git](https://github.com/rstudio/bookdown-demo.git) using git for windows
+
+![image](img/235646222-0ca6b4c0-3afe-4313-9fd6-a8c3c40bf264.png)
+
+
+![image](img/235645534-614e69e1-5d50-45f2-a539-eb7286b18b00.png)
+
+![image](img/235646316-c1030e7a-4714-4796-8c14-7c3212f405e1.png)
+
+
+
+
