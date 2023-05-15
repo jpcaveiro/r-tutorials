@@ -1,0 +1,201 @@
+# Exams {#exams}
+
+
+```{r echo=FALSE, results=FALSE, messages=FALSE}
+knitr::opts_chunk$set(eval = FALSE)
+#library(exams)
+```
+
+
+
+## Concepts
+
+
+**Goals**
+
+
+* reduce the risk of cheating
+* have a one-for-all exams generator
+
+_References_:
+
+* [First Steps (website of R_Exams)](https://www.r-exams.org/tutorials/first_steps/)
+* Achim Zeileis, Nikolaus Umlauf, Friedrich Leisch (2014). "Flexible Generation of E-Learning Exams in R: Moodle Quizzes, OLAT Assessments, and Beyond." Journal of Statistical Software, 58(1), 1-36. <doi:10.18637/jss.v058.i01>
+* [Moodle Tests: Not So Much of a Fuss When You Have R
+M. Cristina Miranda, Anabela Rocha, ICSIT 2022](https://www.iiis.org/DOI2022/EB443PN/)
+
+
+
+**Techniques**
+
+
+Techniques to reduce the risk of cheating:
+
+* Randomly selecting one (or more) out of a set of exercises for each participant.
+* Randomly shuffling answer alternatives in single-choice and multiple-choice questions.
+* Randomly selecting numbers, text blocks, graphics, etc. using the R programming language.
+
+
+_Reference_ [First Steps](https://www.r-exams.org/tutorials/first_steps/)
+
+
+**Output to several formats**
+
+- html and pdf/LaTeX
+- pandoc (for customizable outputs in various formats (Docx, ODF, PDF, ...).
+- nops (fixed PDF format that can be automatically scanned and evaluated), 
+- LMS: moodle, blackboard,
+- QTI XML (various learning management systems: canvaslms, openOlat), arsnova (JSON format)
+
+
+![](images/rexmas-exports.png)
+
+_References_:
+
+* [file demo-all.Rmd](https://www.r-exams.org/assets/posts/2017-09-10-first_steps//demo-all.R)
+
+
+**An exercise, in a standalone file**
+
+Each exercise (or rather “exercise template”):
+
+* Data-generating process written in R.
+* Question text.
+* Solution text.
+* Meta-information.
+
+_Reference_ [First Steps](https://www.r-exams.org/tutorials/first_steps/)
+
+
+**cloze type - a special question format**
+
+"cloze" question type can handle *several questions types*, in the same file, for example inside an R `list` or explicitly described.
+
+
+## In your machine
+
+
+**Install**
+
+
+Some steps:
+
+* [Install R, then RStudio](https://posit.co/download/rstudio-desktop/)
+* [RTools42](https://cran.r-project.org/bin/windows/Rtools/rtools42/rtools.html)
+
+  * For some tasks (e.g., output for some learning management systems) it is necessary that the base R zip() function works. On Windows this requires to install the Rtools and to include them in the PATH environment variable. "Rtools is a toolchain bundle used for building R packages from source"
+
+* Install `exams` package:
+
+```r
+install.packages("exams", dependencies = TRUE)
+```
+
+_Reference_ [Installing R/exams](https://www.r-exams.org/tutorials/installation/)
+
+
+
+**Only once**
+
+
+
+Create a folder for questions and then do:
+
+```r
+setwd("c:/<folder>/rexams-questions")
+```
+
+_Note_ in R one must use "c:/" instead of "c:\\".
+
+
+```r
+library("exams")
+exams_skeleton(markup = "markdown",
+  writer = c("exams2html", "exams2pdf", "exams2moodle"))
+```
+
+
+
+_Reference_ [First steps](https://www.r-exams.org/tutorials/first_steps/)
+
+
+
+## The Slow Development Cycle
+
+
+We use [already created contents](https://www.r-exams.org/templates/) - there creation coul be an addictive process!!
+
+
+
+**Decision about exam contents (step 1/5)** -- a vector of filenames
+
+```{r}
+# setwd("~/<root of r-exams project>")
+library("exams")
+elearn_exam <- c(
+  "swisscapital.Rmd",
+  "deriv.Rmd",
+  "ttest.Rmd",
+  "boxplots.Rmd",
+  "function.Rmd",
+  "lm.Rmd",
+  "fourfold2.Rmd")
+```
+
+
+**Appreciate, in html, the future exam (step 2/5)** -- `exams::exams2html()`
+
+```{r}
+set.seed(2023-05-16) # or 2002
+exams2html(elearn_exam, n = 1, name = "R-exams")
+```
+
+
+* `exams2html` produce html output reading from "exercises" folder and writing to "output" folder
+* `name = "R-exams"` specifies the Moodle Category. Below "R-exams" will reside all the exercises numbered "Exercise 1", "Exercise 2", ....
+* `n` is the number of variations of a question
+
+rules-of-thumb about *n*:
+
+- maybe one can correct a moodle question in runtime (during exam)
+- n=6 is a good number if questions are new (easy to correct)
+- n much greater avoid completely participant copy of solutions but in case of error, a lot of work expects the evaluator/teacher
+
+
+
+**Publish the exam (step 3/5)** -- `exams::exams2moodle()`
+
+```{r}
+set.seed(2023-05-16) 
+exams2moodle(elearn_exam, n = 3, name = "R-exams", dir="output")
+  ## This yields the file R-exams.xml that can be imported into Moodle.
+  ##output folder should contain the xml file.
+```
+
+* `name = "R-exams"` the "R-exams" string will define a new category in Moodle structure.
+
+
+**Moodle import (step 4/5)**
+
+A step-by-step video guide to importing and customizing the quiz in Moodle is available on YouTube at <https://www.youtube.com/watch?v=5K9hrE3YkPs>.
+
+
+**Moodle direct observation (step 5/5)**
+
+Direct observation, of questions, in moodle can clean last mistakes or errors.
+
+
+_Reference_  [E-Learning Quizzes](https://www.r-exams.org/tutorials/elearning/)
+
+
+## stackoverflow
+
+More than 250 questions:
+
+Exemple: "Change TRUE and FALSE to Verdadero and Falso in "mchoice" exercises of R-exams":
+[answer here](https://stackoverflow.com/questions/75249954/change-true-and-false-to-verdadero-and-falso-in-mchoice-exercises-of-r-exams)
+
+* More questions: <https://stackoverflow.com/questions/tagged/r-exams/>
+
+
+_Reference_ [Resources](https://www.r-exams.org/resources/)

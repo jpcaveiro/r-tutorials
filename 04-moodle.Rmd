@@ -1,7 +1,405 @@
-# Moodle
+# Moodle and exams
 
-Source [Question Types](https://docs.moodle.org/402/en/Question_types)
+```{r echo=FALSE}
+require(exams)
+```
 
+Moodle *standard* question types:
+
+-   [ ] 2.1 Calculated
+-   [ ] 2.2 Calculated multi-choice
+-   [ ] 2.3 Calculated simple
+-   [ ] 2.4 Drag and drop into text
+-   [ ] 2.5 Drag and drop markers
+-   [ ] 2.6 Drag and drop onto image
+-   [ ] 2.7 Description
+-   [x] 2.8 Essay
+-   [ ] 2.9 Matching
+-   [x] 2.10 Embedded Answers (Cloze Test / Gap Fill)
+-   [x] 2.11 Multiple choice
+-   [x] 2.12 Short Answer
+-   [x] 2.13 Numerical
+-   [ ] 2.14 Random short-answer matching
+-   [ ] 2.15 Select missing words
+-   [x] 2.16 True/False
+-   [x] File (essay that only requests a file from the participant)
+
+![](images/paste-A0592789.png) package `exams` can produce output to moodle
+
+
+*References*
+
+-   [Question Types](https://docs.moodle.org/402/en/Question_types)
+-   [Dynamic Exercises](https://www.r-exams.org/intro/dynamic/)
+
+
+## schoice
+
+View example [swisscapital: Knowledge Quiz Question about the Swiss Capital](https://www.r-exams.org/templates/swisscapital/).
+
+*Single Choice* means only one sentence is correct.
+
+    Meta-information
+    ================
+    exname: Swiss Capital
+    extype: schoice
+    exsolution: 0100000
+    exshuffle: 5
+
+-   `exname: Swiss Capital` (exercise: where `exname` is used?)
+-   `extype: schoice` -- Single Choice question type
+-   `exsolution: 0100000` -- only second item is correct
+-   `exshuffle: 5` -- `exshuffle` is set to 5 so that 1 correct and 4 random wrong alternatives are subsampled and shuffled.
+
+The exercise filename, `swisscapital.Rmd`, is used in moodle xml file to identify the question in **Moodle Category catalog**:
+
+-   `<text> R1 Q2 : swisscapital </text>` (excert from moodle xml file)
+
+
+
+*working example*
+
+
+    # setwd("~/<root of r-exams project>")
+    library("exams")
+    set.seed(2023-05-16) # or 2002
+    exams2html("exercises/swisscapital.Rmd", 
+               n = 1, 
+               name = "r-exams-tutorial",
+               edir="exercises")
+       ##omitt parameter  dir="output" to open the browser
+
+
+
+    # setwd("~/<root of r-exams project>")
+    library("exams")
+    set.seed(2023-05-16)
+    exams2moodle("exercises/swisscapital.Rmd", 
+                 n = 1, 
+                 name = "r-exams-tutorial",
+                 edir="exercises",
+                 dir="output")
+      ## This yields the file R-exams.xml that can be imported into Moodle.
+
+
+
+
+## mchoice
+
+
+*Multiple Choice* one or more correct.
+
+Danger: students will always earn points if turn on/off every option.
+
+
+View example: [ttest: Interpretation of 2-Sample t Test](https://www.r-exams.org/templates/ttest/)
+
+
+
+    Meta-information
+    ================
+    extype: mchoice
+    exsolution:  r mchoice2string(solutions) 
+    exname: 2-sample t-test
+
+-   `extype: mchoice` -- Multiple Choice question type
+-   `exsolution:  r mchoice2string(solutions)`
+-   `exname`: 2-sample t-test (exercise: where `exname` is used?)
+
+Variable `solutions` is a vector like `c(T,T,F,F,T)` indicating which sentences are true. The vector can be explicitly described or calculated.
+
+
+What does `exams::mchoice2string`?
+
+    > mchoice2string(c(T,T,F,F))
+    [1] "1100"
+
+
+
+*working example*
+
+
+    # setwd("~/<root of r-exams project>")
+    library("exams")
+    set.seed(2023-05-16) # or 2002
+    exams2html("exercises/ttest.Rmd", 
+               name = "r-exams-tutorial",
+               edir="exercises")
+
+
+
+    # setwd("~/<root of r-exams project>")
+    library("exams")
+    set.seed(2023-05-16)
+    exams2moodle("exercises/ttest.Rmd", 
+                 n = 1, 
+                 name = "r-exams-tutorial",
+                 edir="exercises",
+                 dir="output")
+      ## This yields the file R-exams.xml that can be imported into Moodle.
+
+
+
+## numerical
+
+
+The tradicional numeric value input, in Moodle.
+
+
+View example [deriv: Product Rule for Derivatives](https://www.r-exams.org/templates/deriv/)
+
+
+    Meta-information
+    ================
+    extype: num
+    exsolution:  r fmt(res) 
+    exname: derivative exp
+    extol: 0.01
+
+What does `exams::fmt()`? Moodle does not recognize numeric representations like "1e-15":
+
+    library(exams)
+    > fmt(1e-15)
+    [1] "0.00"
+
+
+
+
+
+## shortanswer
+
+
+Exact word: Participant should introduce a word or small sentence to be automatically checked
+
+Small Essays: some exercise authors can use this for participant to introduce small essays but it gives a little of extra work in Moodle!
+
+
+View example [function: String Question about R Functions](https://www.r-exams.org/assets/posts/2017-08-14-function//function.Rmd)
+
+
+    Meta-information
+    ================
+    extype: string
+    exsolution:  r fun 
+    exname: R functions
+
+In the example, the variable `fun` is a word calculated in code and is the solution.
+
+
+
+
+## cloze (explicit Answerlist)
+
+
+`cloze` is a question type that combines numerical, schoice, mchoice, shortanswer, true/false.
+
+
+View example [lm: Simple Linear Regression (with CSV Data)](https://www.r-exams.org/templates/lm/)
+
+
+
+The first 3 items are for a `schoice` question and the last item is a numerical question (declared in meta-information).
+
+    Question
+    ========
+    Using the data provided in [regression.csv](regression.csv) estimate a linear regression of
+    `y` on `x` and answer the following questions.
+
+    Answerlist
+    ----------
+    * `x` and `y` are not significantly correlated
+    * `y` increases significantly with `x`
+    * `y` decreases significantly with `x`
+    * Estimated slope with respect to `x`:
+
+
+The interpretation of each item is given in `exclozetype`:
+
+
+    Meta-information
+    ================
+    exname: Linear regression
+    extype: cloze
+    exsolution:  r mchoice2string(bsol) | r fmt(bhat, 3) 
+    exclozetype: schoice|num
+    extol: 0.01
+
+
+-   `exclozetype: schoice|num` declares question type of items in `Answerlist`
+-   `exsolution:  r mchoice2string(bsol) | r fmt(bhat, 3)`
+    -   are the solutions. For example, after call to `mchoice2string()` and `fmt()`:
+    -   `exsolution: 0100|1.34`
+
+
+
+## cloze (calculated Answerlist and "##" marks)
+
+"cloze" question with use of placeholders like `##ANSWER1##` in combination with meta-information.
+
+
+- [fourfold2: Fourfold Table (Flexible Formatting)](https://www.r-exams.org/templates/fourfold2/)
+
+    Question
+    ========
+    
+    An industry-leading company seeks a qualified candidate for a management position.
+    A management consultancy carries out an assessment center which concludes in making
+    a positive or negative recommendation for each candidate: From previous assessments they know that
+    of those candidates that are actually eligible for the position (event $E$) $r per * 100\%$
+    get a positive recommendation (event $R$). However, out of those candidates that are not eligible
+    $r pnenr * 100\%$ get a negative recommendation. Overall, they know that only
+    $r pe * 100\%$ of all job applicants are actually eligible.
+    
+    What is the corresponding fourfold table of the joint probabilities? (Specify all entries in percent.)
+    
+    |               | $R$           | $\overline{R}$ | sum           |
+    |:-------------:|:-------------:|:--------------:|:-------------:|
+    |$E$            | ##ANSWER1##\% | ##ANSWER3##\%  | ##ANSWER7##\% |
+    |$\overline{E}$ | ##ANSWER2##\% | ##ANSWER4##\%  | ##ANSWER8##\% |
+    |sum            | ##ANSWER5##\% | ##ANSWER6##\%  | ##ANSWER9##\% |
+    
+    ```
+    #line up =>{r questionlist, echo = FALSE, results = "asis"}
+    answerlist(rep("", length(sol)), markup = "markdown")
+    ```
+
+What is `answerlist(...)`? It returns markdown text has if the author types several `*`-items:
+
+
+    > questions <- list(a="aaa", b="bbb")
+    > answerlist(unlist(questions), markup = "markdown")
+    Answerlist
+    ----------
+    * aaa
+    * bbb
+
+    
+
+In meta-information `exclozetype` has 9 numerical declarations:
+
+
+    Meta-information
+    ================
+    extype: cloze
+    exsolution:  r paste(sol, collapse = "|") 
+    exclozetype: num|num|num|num|num|num|num|num|num
+    exname: fourfold
+    extol: 0.05
+    exextra[numwidth,logical]: TRUE
+
+
+-   `exsolution:  r paste(sol, collapse = "|")` could produce something like "100.3\|20.45...."
+-   `exextra[numwidth,logical]: TRUE` -- (to be found in literature!)
+
+- In `exams2moodle()` we support a couple of Moodle-specific `exextra` options, namely some detailed formatting of "essay" type questions. All supported options can be found in the "essayreg" exercise template.
+- Additionally, it's possible to set the `numwidth` and `stringwidth` arguments from `exams2moodle()` also via `exextra` options. See the "fourfold2" exercise template for a worked example.
+
+
+
+*References* [Possible meta-informations in R/exams](https://stackoverflow.com/questions/73713203/possible-meta-informations-in-r-exams)
+
+
+
+## special moodle instructions
+
+Instead of setting `exshuffle` to TRUE (or a number) which does the shuffling on the R side, it is also possible to do the shuffling in Moodle by selecting a `cloze_mchoice_display` that includes shuffling, e.g., `MULTICHOICE_S` or `MULTICHOICE_VS` etc.
+
+
+        exams2moodle(questions,
+                 name = "exameXPTO", 
+                 cloze = list(cloze_mchoice_display = "MULTICHOICE_VS"), 
+                 envir =.GlobalEnv)
+
+where
+
+- `cloze = list(cloze_mchoice_display = "MULTICHOICE_VS")` -- choosen moodle instruction
+- `envir =.GlobalEnv` -- use context variables (used in the Question) stored in user's workspace ("The global environment .GlobalEnv, more often known as the user's workspace, is the first item on the search path")
+
+
+
+*References* [Possible meta-informations in R/exams](https://stackoverflow.com/questions/73713203/possible-meta-informations-in-r-exams)
+
+
+
+## restrictions in moodle "cloze"
+
+The **essays** or **file uploads** are not currently supported in Moodle **cloze type** exercises!
+
+View example [essayreg2.Rmd](https://www.r-exams.org/templates/essayreg2/)
+
+Moodle does not handle when Meta-information combines other types with "essay" or "file" types as case of:
+
+
+    Meta-information
+    ================
+    exname: Linear regression
+    extype: cloze
+    exsolution: OLS|01001| r fmt(ahat, 3) | r fmt(bhat, 3) | r mchoice2string(bsol |nil|nil
+    exclozetype: string|mchoice|num|num|schoice|essay|file
+    extol: 0.01
+
+
+Warnings for Moodle:
+
+-   note `essay|file` in meta-information.
+
+However, R-exams can also output for PDF, HTML and OLAT formats with this question types.
+
+
+
+Instruction `exams2html()` works but not `exams2moodle()`:
+    
+    > library(exams)
+    > setwd("where exercises are")
+    > exams2html("essayreg.Rmd")
+    > exams2moodle("essayreg.Rmd")
+    Error in moodlequestion[[type]](exm[[i]][[j]]) : 
+      essays or file uploads are not currently supported in Moodle cloze type exercises!
+
+
+
+
+## essay/file question type in Moodle
+
+
+They share the same code in Moodle. 
+
+- this section need work! Only file question is working.
+
+Warning: in r-exams the `extype: string` should be declared in meta-information (there is no "extype: file" or "extype: essay"!)
+
+*Reference*. [essayreg.Rmd](https://www.r-exams.org/templates/essayreg/)
+
+
+### essay question
+
+
+*Example of an essay*. Do you think the assumptions of the Gauss-Markov theorem are fulfilled? What are the consequences?
+
+- In `exams2moodle()` we support a couple of Moodle-specific `exextra` options, namely some detailed formatting of "essay" type questions. All supported options can be found in the `essayreg` exercise template.
+- An essay, in Word, can also be uploaded using file question type.
+
+
+
+### file question
+
+
+*Example of file request*. Please upload your code script that reads the data, fits the regression model, extracts the quantities of interest, and generates the diagnostic plots.
+
+
+
+### both file and essay
+
+
+*Example of an essay and file in same moodle question*. 
+
+- Do you think the assumptions of the Gauss-Markov theorem are fulfilled? What are the consequences?
+- Please upload your code script that reads the data, fits the regression model, extracts the quantities of interest, and generates the diagnostic plots
+
+
+    exams2moodle(c("essayreg_moodle_essay.Rmd","essayreg_moodle_file.Rmd"),
+            edir="exercises", 
+            dir="output")
 
 
 

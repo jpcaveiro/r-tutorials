@@ -6,28 +6,3 @@ This is a minimal example of a book based on R Markdown and **bookdown** (https:
 
 You can find the preview of this example at https://bookdown.org/yihui/bookdown-demo/.
 
-# JP Notes
-
-2023/april/3
-
-
-## R/Exams - an approach using Windows
-
-
-## Install git 
-
-Two versions available:
-
-Moderno:
-
-* https://desktop.github.com/
-
-Allows incorporation in RStudio:
-
-* ![image](https://user-images.githubusercontent.com/11158247/235644574-bb30258c-5a24-400d-87a6-ab93b6bf4a30.png)
-
-
-## bookdown
-
-
-
