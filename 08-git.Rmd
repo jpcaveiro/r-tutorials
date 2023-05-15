@@ -24,3 +24,10 @@
 
 ![](images/paste-878E479F.png)
 
+## gh pages
+
+* https://github.com/jpcaveiro/r-tutorials/settings/pages
+
+* cp -r _book docs
+
+
