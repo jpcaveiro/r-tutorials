@@ -72,6 +72,8 @@ exams_skeleton(markup = "markdown",
   writer = c("exams2html", "exams2pdf", "exams2moodle"))
 ```
 
+* It generate three folders: exercises, output, templates. 
+* "exercises" contains R-Exams.org examples.
 
 
 ## working example "swisscapital"
